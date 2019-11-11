@@ -1,8 +1,10 @@
 # script to export data to and to update a file
-# DATA SHOULD BE FORMATTED AS FOLLOWS!
-weirdvariable = 2
+# to use, add
+from shareData import updateFileList
 
-data = {"T":weirdvariable,"W":0,"lambda":30}
+# DATA SHOULD BE FORMATTED AS FOLLOWS!
+data = {"T":5,"W":0,"lambda":30}
+
 #---------- copy code below ----------
 def updateFileList(data):
     print()
@@ -56,5 +58,3 @@ def updateFileList(data):
         newfile.write(line)
 
     file.close()
-
-updateFileList(data)
