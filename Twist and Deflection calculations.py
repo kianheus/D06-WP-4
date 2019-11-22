@@ -20,9 +20,10 @@ x_frontspar = 0.20          # Front spar position   [%]
 x_rearspar = 0.60           # Rear spar position    [%]
 
 # To be exactly determined
-t_sheet = 0.001             # Sheet thickness       [m]
-step = 0.1                  # Calculation accuracy  [-]
+t_sheet = 0.005             # Sheet thickness       [m]
+points = 1000               # Calculation accuracy  [-]
 A_str = 0.001               # Area of a stringer    [m^2]
+step = (b/2)/points         # Step size             [-]
 
 # Stringers
 ''' To insert stringers on your desired location, you first set the intervals at which
@@ -48,12 +49,76 @@ M = np.array(0)             # Array of the moments  [Nm]    FILLER
 E = 69 * 10**9              # E-modulus of material [Pa]    FILLER
 G = 27 * 10**9              # G-modulus of material [Pa]    FILLER
 
+# Moment distribution function --------------------------------------------------------------
+
+def getMomentDistr(Ldistr):
+    Ldistr[0] = 0
+    Ldistr.append(0)
+    LdistrArr = -1 * np.array(Ldistr)
+    Ldistr = list(LdistrArr)
+
+    # Input variables
+    L = b/2  # half wing span
+    Lmax = 2500
+    npoints = len(Ldistr) - 1
+    dy = L / npoints
+
+    # Find p position
+    Ppos = round(0.35 * npoints)
+
+    def p(n, Ppos):
+        if n == Ppos:
+            return 20267
+        else:
+            return 0
+
+
+    # Calculate wing weight along y
+    def W_w(y):
+        return 391.2366 * (-0.215585 * y + 3.695654)
+
+    W_w_distr = []
+    for n in range(npoints + 1):
+        W_w_distr.append(W_w((L / npoints) * n))
+    W_w_distr[0] = 0
+    W_w_distr[npoints] = 0
+
+    halfWingWeight, error = sp.integrate.quad(W_w, 0, L)
+    print(halfWingWeight)
+    
+    # Calculate shear
+    sumdistr = []
+    for n in range(npoints + 1):
+        sumdistr.append((W_w_distr[n] + Ldistr[n]))
+
+    shear_internal_distr = []
+    for n in range(npoints + 1):
+        sum_integral = []
+        for n_1 in range(n, npoints + 1):
+            sum_integral.append((sumdistr[n_1] * dy + p(n_1, Ppos)))
+        sum_contribution = sum(sum_integral)
+        shear_internal_distr.append(sum_contribution)
+
+    moment_internal_distr = []
+    for n in range(npoints + 1):
+        sum_integral = []
+        for n_1 in range(n, npoints + 1):
+            sum_integral.append((shear_internal_distr[n_1] * dy))
+        sum_contribution = sum(sum_integral)
+        moment_internal_distr.append(sum_contribution)
+
+    # Make graphs
+    ytab = []
+    for n in range(npoints + 1):
+        ytab.append(n)
+
+    return moment_internal_distr
 
 # Calculations of length, area & centroid ---------------------------------------------------
 
 # Creating the steps and interval. This will decide the level
 #   of detail of the calculations
-y = np.arange(0, b/2, step)
+y = np.linspace(0, b/2, points)
 n_points = len(y)
 C_y = C_r + C_t * (y/(b/2)) - C_r * (y/(b/2))   # Chord as function of y    [m]
 ylst = y.tolist()
@@ -162,7 +227,7 @@ additional code will be required. '''
 
 # Making a fake lift distribution
 def L_prime(y):
-    return 43.4
+    return 12467
 
 def L(y):
     return L_prime(0)*b/2
@@ -245,7 +310,7 @@ C_3 = -phi[0]
 phi += C_3
 print('Twist integration done')
 
-# Statistics
+# Statistics --------------------------------------------------------------------------------
 v_max = -np.amin(v)
 v_percentage = v_max/b * 100
 phi_max = abs(-np.amin(phi) * 180 / math.pi)
