@@ -46,7 +46,7 @@ h_frontspar = 0.0908        # Front spar height     [%]     FILLER
 h_rearspar = 0.0804         # Rear spar height      [%]     FILLER
 
 M = np.array(0)             # Array of the moments  [Nm]    FILLER
-E = 69 * 10**9              # E-modulus of material [Pa]    FILLER
+E = 72 * 10**9              # E-modulus of material [Pa]    FILLER
 G = 27 * 10**9              # G-modulus of material [Pa]    FILLER
 
 # Lift distribution -------------------------------------------------------------------------
