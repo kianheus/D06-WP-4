@@ -88,7 +88,7 @@ def getMomentDistr(Ldistr):
     W_w_distr[npoints] = 0
 
     halfWingWeight, error = sp.integrate.quad(W_w, 0, L)
-    print(halfWingWeight)
+    #print(halfWingWeight)
     
     # Calculate shear
     sumdistr = []
