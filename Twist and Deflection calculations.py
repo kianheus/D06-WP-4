@@ -392,7 +392,7 @@ print('Twist integration done')
 # Statistics --------------------------------------------------------------------------------
 v_max = -np.amin(v)
 v_percentage = v_max/b * 100
-phi_max = abs(-np.amin(phi) * 180 / math.pi)
+phi_max = abs(-np.amax(phi) * 180 / math.pi)
 
 print(' ')
 print('The wing box mass (half span) is', round(Mass, 2),'[kg]')
