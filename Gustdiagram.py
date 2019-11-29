@@ -77,18 +77,18 @@ for i in W:
         #V_F_approach = 1.8 * V_S1_MLW
         #V_F_climb = 1.8 * V_S0_landing
         #V_F = max(V_F_land, V_F_approach, V_F_climb)  # Flapped speed [m/s] REQUIREMENTS VERRY VAGUE !!
-
-        # New codecompared to V_n loaddiagram
-        mu = (2 * i / S)/(rho * MAC * CL_a * g)
-        K_G = (0.88 * mu) / (5.3 + mu)
-        V_B = V_S1 * sqrt(
-            1 + (K_G * rho_0 * V_C * CL_a) / (2 * i / S))  # Design speed maximum gust intensity [m/s]
-        V_TAS = np.arange(0.0001, V_B, 1) / sqrt(rho / rho_0)  # TAS that needed to be considred
-        gustgrad = np.arange(9, max((107 + 1), (12.5 * MAC + 1)), 1)  # gust gradients needed to be considred [m]
         if altitude <= 4572:
             Uref = 17.07 - (3.66*altitude)/4572
         elif altitude >= 4572:
             Uref = 13.41 - (7.05*altitude)/18288
+        # New codecompared to V_n loaddiagram
+        mu = (2 * i / S)/(rho * MAC * CL_a * g)
+        K_G = (0.88 * mu) / (5.3 + mu)
+        V_B = V_S1 * sqrt(
+            1 + (K_G * rho_0 * Uref * V_C * CL_a) / (2 * i / S))  # Design speed maximum gust intensity [m/s]
+        V_TAS = np.arange(0.0001, V_B, 1) / sqrt(rho / rho_0)  # TAS that needed to be considred
+        gustgrad = np.arange(9, max((107 + 1), (12.5 * MAC + 1)), 1)  # gust gradients needed to be considred [m]
+
         Fgz = 1 - (altitude_cruise / 76200)
         R1 = MLW / MTOW
         R2 = MZFW / MTOW
@@ -106,7 +106,7 @@ for i in W:
                 Ktime = 2 * i / (CL_aM * rho * joop * g * S)
                 omega = pi * joop / henk
                 t = np.arange(0, (2 * pi / omega), (2 * pi / omega) / 100)
-                dns_p = Uds * (omega * np.sin(omega * t) + 1) * ((np.exp(-t / Ktime) / Ktime)
+                dns_p = Uds/(2*g) * (omega * np.sin(omega * t) + 1) * ((np.exp(-t / Ktime) / Ktime)
                                                               - np.cos(omega * t) / Ktime - omega * np.sin(omega * t)) / (
                                     1 + (omega * Ktime) ** -2)
                 maxi = abs(max(dns_p,key=abs))
