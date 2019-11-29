@@ -6,11 +6,11 @@ from scipy import integrate
 # USE getMomentDistr(Ldistr) aAND getTorsionDistribution(Ldistr, M_distr, rho, V, T)
 
 # get internal moment distribution
-def getMomentDistr(Ldistr):
+def getMomentDistr(Ldistr,loadfactor):
     Ldistr[0] = 0
     Ldistr.append(0)
     LdistrArr = -1 * np.array(Ldistr)
-    Ldistr = list(LdistrArr)
+    Ldistr = list(LdistrArr*loadfactor)
 
     # input variables
     L = 12.009  # half wing span
@@ -68,12 +68,14 @@ def getMomentDistr(Ldistr):
     return moment_internal_distr
 
 # get internal torsion distribution
-def getTorsionDistribution(Ldistr, M_distr, rho, V, T):
+def getTorsionDistribution(Ldistr, M_distr, rho, V, T, loadfactor):
+    Ldistr = list(np.array(Ldistr)*loadfactor)
     # Define inputs
     def c(y):
         c = -0.21558573 * y + 3.6956254
         return c
 
+    T = T * 0.8765588
     b_half = 12.009
 
     W_e = (2066 + (872.57 / 2)) * 9.81
