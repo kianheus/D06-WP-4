@@ -83,7 +83,6 @@ for line in lines10:
     if line.count("Cm   =")==1:
         Cm10  = float(line.strip("Cm   ="))
         
-        
     #Protect against empty line and use only columns with numerical (positive or negative) values
     if len(line)>0 and (line[0].isdigit()==True or line[0]=="-"):
 
@@ -107,9 +106,9 @@ CmQuarter10  = sp.interpolate.interp1d(yspanlst,CmQuarter10lst,kind='cubic',fill
 #-------------------------Functions for forces-------------------------
 
 #Define flow conditions and required total CLd
-density = 0.3796    #[kg/m^3]
-V       = 228.31    #[m/s]
-CLd     = 0.4545    #[-]
+density = 1.225   #[kg/m^3]
+V       = 68.26   #[m/s]
+CLd     = 1.8182  #[-]
 
 #Required AoA for a certain total CLd
 AoAd = asin((CLd-CL0)/(CL10-CL0)*sin(10*pi/180))
@@ -158,9 +157,9 @@ InducedAoA10lst   = []
 
 
 #Plot the L, D and M at 125 distributed along the half span:
-for i in range(0,1000):
+for i in range(0,500):
     #0.096 metres per point, and 1200 points calculated per half wing
-    y =i*12/1000
+    y =i*12/500
     #Create lists for lift, induced drag, pitching moment at each y point
     ylst.append(y)
     Liftlst.append(L(y))
@@ -168,7 +167,6 @@ for i in range(0,1000):
     PitchingMomentlst.append(M(y))
     InducedAoA0lst.append(InducedAoA0(y))
     InducedAoA10lst.append(InducedAoA10(y))
-
 
 
 #-------------------------Total forces-----------------------
@@ -181,7 +179,6 @@ PitchingMomentTotal = sp.integrate.quad(M, -12.005, 12.005)[0]
 print("Total lift",round(LiftTotal,4))
 print("Total drag:",round(DragTotal,4))
 print("Total pitching moment:",round(PitchingMomentTotal,4))
-
 
 
 print("Ready")
