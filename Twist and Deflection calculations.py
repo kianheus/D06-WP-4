@@ -34,9 +34,9 @@ G = 27 * 10**9              # G-modulus of material [Pa]
 rho = 2660                  # Density of material   [kg/m^3]
 
 # Thickness and area design choices                 [FILLERS]
-t_sheet_spar = 0.0035        # Spar thickness        [m]
-t_sheet_hor = 0.0053         # Horizontal sheets thickness [m]
-A_str = 10*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
+t_sheet_spar = 0.002        # Spar thickness        [m]
+t_sheet_hor = 0.0033         # Horizontal sheets thickness [m]
+A_str = 50*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
 
 # Stringers design choices                          [FILLERS]
 ''' To insert stringers on your desired location, you first set the intervals at which
@@ -47,11 +47,11 @@ will be 4 stringers located at [0.2, 0.4, 0.6, 0.8] percent of the chord up unti
 of the span. Then until 50% it will look like [0.2, 0.4, 0.8] etc.'''
 
 distance_top = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_top = np.array([[0.1, 0.1, 0.1],[1, 1, 1]])
+stringers_top = np.array([[0.1, 0.1, 0.1],[0.2,0.2,0.2],[0.4,0.4,0.4], [0.6,0.6,0.6],[1, 1, 1]])
 topstr = sp.interpolate.interp1d(distance_top,stringers_top,kind='next',fill_value='extrapolate')
 
 distance_bot = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_bot = np.array([[0.1, 0.1, 0.1],[1, 1, 1]])
+stringers_bot = np.array([[0.1, 0.1, 0.1],[0.2,0.2,0.2],[0.4,0.4,0.4], [0.6,0.6,0.6],[1, 1, 1]])
 botstr = sp.interpolate.interp1d(distance_bot,stringers_bot,kind='next',fill_value='extrapolate')
 
 
@@ -278,7 +278,8 @@ theta_III = np.tan((L_IV-L_II)/L_I)
 I_III = I_III_x * np.cos(theta_III)**2 + I_III_y * np.sin(theta_III)**2 + A_III * (z_III-z_n)**2
 
 # Final MOI         [m^4]
-I = I_I + I_II + I_III + I_IV + I_str_top + I_str_bot
+I_str = I_str_top + I_str_bot
+I = I_I + I_II + I_III + I_IV + I_str
 I_lst = np.array(I).tolist()
 AMOI = sp.interpolate.interp1d(y,I_lst,kind='cubic',fill_value='extrapolate')
 I_plot = np.array(AMOI(y))
@@ -403,6 +404,7 @@ plt.subplot(222)
 plt.plot(y, dvdy)
 plt.subplot(223)
 plt.plot(y, I)
+plt.plot(y, I_str)
 plt.subplot(224)
 plt.plot(y, phi)
 #plt.plot(y, M)
