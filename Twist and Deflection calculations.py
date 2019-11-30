@@ -34,9 +34,9 @@ G = 27 * 10**9              # G-modulus of material [Pa]
 rho = 2660                  # Density of material   [kg/m^3]
 
 # Thickness and area design choices                 [FILLERS]
-t_sheet_spar = 0.005        # Spar thickness        [m]
-t_sheet_hor = 0.005         # Horizontal sheets thickness [m]
-A_str = 8*10**-5            # Area of a stringer    [m^2] 2cm x 2mm x 2
+t_sheet_spar = 0.002        # Spar thickness        [m]
+t_sheet_hor = 0.004         # Horizontal sheets thickness [m]
+A_str = 50*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
 
 # Stringers design choices                          [FILLERS]
 ''' To insert stringers on your desired location, you first set the intervals at which
@@ -46,12 +46,12 @@ and locations [[0.2, 0.2, 0.2], [0.4, 0.4, 0], [0.6, 0, 0], [0.8, 0.8, 0.8]], th
 will be 4 stringers located at [0.2, 0.4, 0.6, 0.8] percent of the chord up until 25%
 of the span. Then until 50% it will look like [0.2, 0.4, 0.8] etc.'''
 
-distance_top = np.array([0.25, 0.75, 1])             # Interval of stringer variance [%span]
-stringers_top = np.array([[0.2, 0.2, 0.2], [0.4, 0.4, 0], [0.6, 0, 0], [0.8, 0.8, 0.8]])
+distance_top = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
+stringers_top = np.array([[0, 0, 0],[0.25, 0,0],[0.5, 0.5,0],[0.75, 0,0],[1, 1, 1]])
 topstr = sp.interpolate.interp1d(distance_top,stringers_top,kind='next',fill_value='extrapolate')
 
-distance_bot = np.array([0.25, 0.5, 1])             # Interval of stringer variance [%span]
-stringers_bot = np.array([[0.2, 0.2, 0.2], [0.4, 0.4, 0], [0.6, 0, 0], [0.8, 0.8, 0.8]])
+distance_bot = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
+stringers_bot = np.array([[0, 0, 0],[0.25, 0,0],[0.5, 0.5,0],[0.75, 0,0],[1, 1, 1]])
 botstr = sp.interpolate.interp1d(distance_bot,stringers_bot,kind='next',fill_value='extrapolate')
 
 
@@ -226,31 +226,6 @@ z_II = L_IV - 0.5*L_II
 z_III = 0.5 * (L_IV - L_II)
 z_IV = 0.5 * L_IV
 
-# Calculating the wing box mass -------------------------------------------------------------
-
-# Individual sheets
-M_I = (L_I[0] + L_I[-1]) / 2 * t_sheet_hor * b/2 * rho
-M_II = (L_II[0] + L_II[-1]) / 2 * t_sheet_spar * b/2 * rho
-M_III = (L_III[0] + L_III[-1]) / 2 * t_sheet_hor * b/2 * rho
-M_IV = (L_IV[0] + L_IV[-1]) / 2 * t_sheet_spar * b/2 * rho
-
-# Stringers
-lentot_top = 0
-for i in range(len(distance_top)):
-    lentot_top += len(topstr(distance_top[i])) * distance_top[i] * b/2
-
-lentot_bot = 0
-for i in range(len(distance_bot)):
-    lentot_bot += len(botstr(distance_bot[i])) * distance_bot[i] * b/2
-
-lentot = lentot_top + lentot_bot
-
-M_str = lentot * A_str * rho
-
-# Total mass
-Mass = M_I + M_II + M_III + M_IV + M_str
-
-
 # Calculating the moment of inertia for the stringers----------------------------------------
 
 n_iterations = len(y)
@@ -283,8 +258,9 @@ n_str_bot = np.array(n_strlist_bot)
 z_n = (A_str*(n_str_top)*z_I + A_str*(n_str_bot)*z_III + A_I*z_I + A_II*z_II + A_III*z_III + A_IV*z_IV) / (A_I + A_II + A_III + A_IV + A_str*(n_str_top+n_str_bot))
 
 # Stringer MOI
-I_str_bot = n_str_bot * A_str * (z_I-z_n)**2
-I_str_top = n_str_top * A_str * (z_I-z_n)**2
+# The stringer shape is assumed square
+I_str_bot = n_str_bot * (A_str * (z_I-z_n)**2 + A_str**2)
+I_str_top = n_str_top * (A_str * (z_I-z_n)**2 + A_str**2)
 
 # Calculating the moment of inertia for the sheets-------------------------------------------
 
@@ -313,7 +289,30 @@ def I_y(y):
 # OUTPUT: Moment of inertia as a function of y: I_y(y) 
 print('MOI done')
 
-# Calculating the torsional constant --------------------------------------------------------
+# Calculating the wing box mass -------------------------------------------------------------
+
+
+# Individual sheets
+M_I = (L_I[0] + L_I[-1]) / 2 * t_sheet_hor * b/2 * rho
+M_II = (L_II[0] + L_II[-1]) / 2 * t_sheet_spar * b/2 * rho
+M_III = (L_III[0] + L_III[-1]) / 2 * t_sheet_hor * b/2 * rho
+M_IV = (L_IV[0] + L_IV[-1]) / 2 * t_sheet_spar * b/2 * rho
+
+# Stringers
+lentot_top = 0
+for i in range(len(distance_top)):
+    lentot_top += len(topstr(distance_top[i])[distance_top[i] != 0]) * distance_top[i] * b/2
+
+lentot_bot = 0
+for i in range(len(distance_bot)):
+    lentot_bot += len(botstr(distance_bot[i])[distance_bot[i] != 0]) * distance_bot[i] * b/2
+
+lentot = lentot_top + lentot_bot
+
+M_str = lentot * A_str * rho
+
+# Total mass
+Mass = M_I + M_II + M_III + M_IV + M_str# Calculating the torsional constant --------------------------------------------------------
 
 
 A_encl = L_I*L_II + (L_IV-L_II)*L_I*0.5 - A_str*(n_str_bot+n_str_top) # Enclosed area [m^2]
@@ -330,6 +329,8 @@ def J_y(y):
 print('J done')
 
 # Moment and torque functions ---------------------------------------------------------------
+
+
 M = getMomentDistr(Ldistr, n)
 T = getTorsionDistribution(Ldistr, Mdistr, rho, V, T_engine, n)
 
@@ -401,9 +402,13 @@ print('The wing box mass (half span) is', round(Mass, 2),'[kg]')
 print('The maximum deflection is', round(v_max, 4), '[m] or', round(v_percentage, 3), '[%] of the span.')
 print('The maximum twist is', round(phi_max, 4),'[deg]')
 print("Calculations took %s seconds." % round((time.time() - start_time), 2))
+plt.subplot(221)
 plt.plot(y, v)
+plt.subplot(222)
 plt.plot(y, dvdy)
+plt.subplot(223)
 plt.plot(y, I)
+plt.subplot(224)
 plt.plot(y, phi)
 #plt.plot(y, M)
 plt.show()
