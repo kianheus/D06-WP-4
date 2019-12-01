@@ -47,11 +47,11 @@ will be 4 stringers located at [0.2, 0.4, 0.6, 0.8] percent of the chord up unti
 of the span. Then until 50% it will look like [0.2, 0.4, 0.8] etc.'''
 
 distance_top = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_top = np.array([[0.1, 0.1, 0.1],[0.2,0.2,0.2],[0.4,0.4,0.4], [0.6,0.6,0.6],[1, 1, 1]])
+stringers_top = np.array([[0.1, 0.1, 0.1],[1, 1, 0]])
 topstr = sp.interpolate.interp1d(distance_top,stringers_top,kind='next',fill_value='extrapolate')
 
 distance_bot = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_bot = np.array([[0.1, 0.1, 0.1],[0.2,0.2,0.2],[0.4,0.4,0.4], [0.6,0.6,0.6],[1, 1, 1]])
+stringers_bot = np.array([[0.1, 0.1, 0.1],[1, 1, 0]])
 botstr = sp.interpolate.interp1d(distance_bot,stringers_bot,kind='next',fill_value='extrapolate')
 
 
@@ -301,7 +301,7 @@ M_IV = (L_IV[0] + L_IV[-1]) / 2 * t_sheet_spar * b/2 * rho
 
 # Stringers
 
-lentot = (np.sum(n_str_bot) + np.sum(n_str_bot)) * b/2/n_points
+lentot = (np.sum(n_str_top) + np.sum(n_str_bot)) * b/2/n_points
 
 M_str = lentot * A_str * rho
 
