@@ -19,12 +19,12 @@ C_t = 1.107118055           # Tip chord             [m]
 b = 24.01371734             # Wing span             [m]
 x_frontspar = 0.20          # Front spar position   [%]
 x_rearspar = 0.60           # Rear spar position    [%]
-h_frontspar = 0.09065       # Front spar height     [%]
-h_rearspar = 0.08116        # Rear spar height      [%]
-T_engine = 21244            # Engine thrust         [N] FILLER
+h_frontspar = 0.0908        # Front spar height     [%]
+h_rearspar = 0.0804         # Rear spar height      [%]
+T_engine = 21244            # Engine thrust         [N]
 V = 228.31                  # Max speed             [m/s]
 
-n = 2.5 * 1.5               # Load factor           [-]
+n = 3.75               # Load factor           [-]
 
 # --------------------
 # ---DESIGN CHOICES---
@@ -37,8 +37,8 @@ rho = 2660                  # Density of material   [kg/m^3]
 
 # Thickness and area design choices                 [FILLERS]
 t_sheet_spar = 0.002        # Spar thickness        [m]
-t_sheet_hor = 0.0066        # Horizontal sheets thickness [m]
-A_str = 50*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
+t_sheet_hor = 0.0056        # Horizontal sheets thickness [m]
+A_str = 60*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
 
 # Stringers design choices                          [FILLERS]
 ''' To insert stringers on your desired location, you first set the intervals at which
@@ -48,14 +48,17 @@ and locations [[0.2, 0.2, 0.2], [0.4, 0.4, 0], [0.6, 0, 0], [0.8, 0.8, 0.8]], th
 will be 4 stringers located at [0.2, 0.4, 0.6, 0.8] percent of the chord up until 25%
 of the span. Then until 50% it will look like [0.2, 0.4, 0.8] etc.'''
 
-distance_top = np.array([0.4, 0.6, 1])                        # Interval of stringer variance [%span]
-stringers_top = np.array([[0.1, 0.1, 0.1],[0.25,0,0],[0.5,0.5,0],[0.75,0,0],[1, 1, 1]])
+distance_top = np.array([0.13, 0.46, 1])                        # Interval of stringer variance [%span]
+stringers_top = np.array([[0.001, 0.001, 0.001],[0.1, 0, 0],[0.2, 0.2, 0], \
+                          [0.3, 0, 0],[0.5, 0.5, 0.5], \
+                          [0.7, 0, 0],[0.8, 0.8, 0],[0.9, 0, 0],[1, 1, 1]])
 topstr = sp.interpolate.interp1d(distance_top,stringers_top,kind='next',fill_value='extrapolate')
 
-distance_bot = np.array([0.4, 0.6, 1])                        # Interval of stringer variance [%span]
-stringers_bot = np.array([[0.1, 0.1, 0.1],[0.25,0,0],[0.5,0.5,0],[0.75,0,0],[1, 1, 1]])
+distance_bot = np.array([0.13, 0.46, 1])                        # Interval of stringer variance [%span]
+stringers_bot = np.array([[0.001, 0.001, 0.001],[0.1, 0, 0],[0.2, 0.2, 0], \
+                          [0.3, 0, 0],[0.5, 0.5, 0.5], \
+                          [0.7, 0, 0],[0.8, 0.8, 0],[0.9, 0, 0],[1, 1, 1]])
 botstr = sp.interpolate.interp1d(distance_bot,stringers_bot,kind='next',fill_value='extrapolate')
-
 
 # Lift and moment distribution --------------------------------------------------------------
 
@@ -400,14 +403,37 @@ print('The wing box mass (half span) is', round(Mass, 2),'[kg]')
 print('The maximum deflection is', round(v_max, 4), '[m] or', round(v_percentage, 3), '[%] of the span.')
 print('The maximum twist is', round(phi_max, 4),'[deg]')
 print("Calculations took %s seconds." % round((time.time() - start_time), 2))
-plt.subplot(221)
+
+# Twist and deflection plots
+plt.subplot(121)
+plt.title("Bending deflection along the wing span, load factor 3.75")
+plt.xlabel("Span [m]")
+plt.ylabel("Deflection [m]")
 plt.plot(y, v)
-plt.subplot(222)
-plt.plot(y, dvdy)
-plt.subplot(224)
+plt.subplot(122)
+plt.title("Twist distribution along the wing span, load factor 3.75")
+plt.xlabel("Span [m]")
+plt.ylabel("Twist [rad]")
+plt.plot(y, phi)
+
+fig = plt.gcf()
+fig.set_size_inches(12, 6)
+fig.savefig('DES1_n3.75_v_phi.png', dpi=100)
+plt.show()
+
+# MOI and J plots
+plt.subplot(121)
+plt.title("Moment of inertia along the wing span")
+plt.xlabel("Span [m]")
+plt.ylabel("MOI [m^4]")
 plt.plot(y, I)
-plt.plot(y, I_str)
-plt.subplot(223)
-plt.plot(y, M)
-#plt.plot(y, M)
+plt.subplot(122)
+plt.title("Torsional constant along the wing span")
+plt.xlabel("Span [m]")
+plt.ylabel("Torsional constant [m^4]")
+plt.plot(y, J)
+
+fig = plt.gcf()
+fig.set_size_inches(12, 6)
+fig.savefig('DES1_I_J.png', dpi=100)
 plt.show()
