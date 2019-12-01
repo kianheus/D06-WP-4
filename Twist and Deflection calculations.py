@@ -24,7 +24,7 @@ h_rearspar = 0.0804         # Rear spar height      [%]
 T_engine = 21244            # Engine thrust         [N] FILLER
 V = 228.31                  # Max speed             [m/s]
 
-n = 2.5                     # Load factor           [-]
+n = 2.5 * 1.5               # Load factor           [-]
 
 # ---DESIGN CHOICES---
 
@@ -259,8 +259,8 @@ z_n = (A_str*(n_str_top)*z_I + A_str*(n_str_bot)*z_III + A_I*z_I + A_II*z_II + A
 
 # Stringer MOI
 # The stringer shape is assumed square
-I_str_bot = n_str_bot * (A_str * (z_I-z_n)**2 + A_str**2)
-I_str_top = n_str_top * (A_str * (z_I-z_n)**2 + A_str**2)
+I_str_bot = n_str_bot * (A_str * (z_I-z_n)**2 + A_str**2 / 12)
+I_str_top = n_str_top * (A_str * (z_I-z_n)**2 + A_str**2 / 12)
 
 # Calculating the moment of inertia for the sheets-------------------------------------------
 
