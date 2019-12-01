@@ -26,7 +26,9 @@ V = 228.31                  # Max speed             [m/s]
 
 n = 2.5 * 1.5               # Load factor           [-]
 
+# --------------------
 # ---DESIGN CHOICES---
+# --------------------
 
 # Material properties (Al-4047)
 E = 72 * 10**9              # E-modulus of material [Pa]
@@ -35,7 +37,7 @@ rho = 2660                  # Density of material   [kg/m^3]
 
 # Thickness and area design choices                 [FILLERS]
 t_sheet_spar = 0.002        # Spar thickness        [m]
-t_sheet_hor = 0.0033         # Horizontal sheets thickness [m]
+t_sheet_hor = 0.0066        # Horizontal sheets thickness [m]
 A_str = 50*10**-5           # Area of a stringer    [m^2] 5cm x 5mm x 2
 
 # Stringers design choices                          [FILLERS]
@@ -46,12 +48,12 @@ and locations [[0.2, 0.2, 0.2], [0.4, 0.4, 0], [0.6, 0, 0], [0.8, 0.8, 0.8]], th
 will be 4 stringers located at [0.2, 0.4, 0.6, 0.8] percent of the chord up until 25%
 of the span. Then until 50% it will look like [0.2, 0.4, 0.8] etc.'''
 
-distance_top = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_top = np.array([[0.1, 0.1, 0.1],[1, 1, 0]])
+distance_top = np.array([0.4, 0.6, 1])                        # Interval of stringer variance [%span]
+stringers_top = np.array([[0.1, 0.1, 0.1],[0.25,0,0],[0.5,0.5,0],[0.75,0,0],[1, 1, 1]])
 topstr = sp.interpolate.interp1d(distance_top,stringers_top,kind='next',fill_value='extrapolate')
 
-distance_bot = np.array([0.3, 0.5, 1])                        # Interval of stringer variance [%span]
-stringers_bot = np.array([[0.1, 0.1, 0.1],[1, 1, 0]])
+distance_bot = np.array([0.4, 0.6, 1])                        # Interval of stringer variance [%span]
+stringers_bot = np.array([[0.1, 0.1, 0.1],[0.25,0,0],[0.5,0.5,0],[0.75,0,0],[1, 1, 1]])
 botstr = sp.interpolate.interp1d(distance_bot,stringers_bot,kind='next',fill_value='extrapolate')
 
 
@@ -402,10 +404,10 @@ plt.subplot(221)
 plt.plot(y, v)
 plt.subplot(222)
 plt.plot(y, dvdy)
-plt.subplot(223)
+plt.subplot(224)
 plt.plot(y, I)
 plt.plot(y, I_str)
-plt.subplot(224)
-plt.plot(y, phi)
+plt.subplot(223)
+plt.plot(y, M)
 #plt.plot(y, M)
 plt.show()
