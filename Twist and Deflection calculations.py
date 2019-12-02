@@ -19,8 +19,8 @@ C_t = 1.107118055           # Tip chord             [m]
 b = 24.01371734             # Wing span             [m]
 x_frontspar = 0.20          # Front spar position   [%]
 x_rearspar = 0.60           # Rear spar position    [%]
-h_frontspar = 0.0908        # Front spar height     [%]
-h_rearspar = 0.0804         # Rear spar height      [%]
+h_frontspar = 0.09065       # Front spar height     [%]
+h_rearspar = 0.08116        # Rear spar height      [%
 T_engine = 21244            # Engine thrust         [N]
 V = 228.31                  # Max speed             [m/s]
 
